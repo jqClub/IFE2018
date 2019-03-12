@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+    <body>
+        <div class="wrapper">
+            <input type="text" id="email-input" oninput="changeEventHandler()">
+            <ul id="email-sug-wrapper" class="email-sug">
+            	<!--<li>12345</li>
+            	<li>12345</li>-->
+            </ul>
+        </div>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript">
+            
+            // 邮箱后缀List参考
+            var postfixList = ['163.com', 'gmail.com', '126.com', 'qq.com', '263.net'];
+            <!-- 通过一个小练习综合运用 HTML、CSS、JavaScript，我们要实现一个邮箱输入的提示功能。最终示意图： -->
+			
+			
+			//获取用户的输入值
+            function changeEventHandler(){
+                var idFname = e('#email-input')
+                var value = idFname.value
+                
+                value = value.replace(/^\s+|\s+$/g,"")
+                userAddSuffix(value)
+            }
+            
+            //1.设置一个数组，来存所有的数据
+            //2.for循环，添加html
+            //3.插入到页面中去
+            var htmlTemplate = function(data) {
+            	var r = `<li>${data}</li>`
+            	return r
+            }
+            //用户数据加上邮箱后缀
+            var userAddSuffix = function(data) {
+            	var that = this
+            	
+            	var emailSug = e('#email-sug-wrapper')
+            	emailSug.innerHTML = ''
+            	if(!data) {
+            		return
+            	}
+            	
+            	//添加html文件
+            	var reuslt = ''
+            	for(var i = 0; i < postfixList.length; i++) {
+            		reuslt += htmlTemplate(data + '@' +postfixList[i])
+            	}
+            	
+            	insertContent(emailSug, reuslt)
+            }
+            
+            var __main = function() {
+            	
+            }
+            __main()
+        </script>
+    </body>
+</html>
