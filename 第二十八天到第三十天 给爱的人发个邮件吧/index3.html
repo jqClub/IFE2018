@@ -8,8 +8,14 @@
             2. 鼠标如果点击某个提示，则提示内容进入输入框，同时提示框消失
             3.在上个步骤结束后，在输入框中任意再输入字符或删除字符，则重新开始出现提示框
         -->
+        <style>
+        	.move-back {
+        		background: red;
+        	}
+        </style>
     </head>
     <body>
+    	
         <div class="wrapper">
             <input type="text" id="email-input" oninput="changeEventHandler()">
             <ul id="email-sug-wrapper" class="email-sug">
@@ -21,10 +27,10 @@
             var postfixList = ['163.com', 'gmail.com', '126.com', 'qq.com', '263.net'];
 //          <!-- 通过一个小练习综合运用 HTML、CSS、JavaScript，我们要实现一个邮箱输入的提示功能。最终示意图： -->
 			
-			
+			var idFname = e('#email-input')
 			//获取用户的输入值
             function changeEventHandler(){
-                var idFname = e('#email-input')
+                
                 var value = idFname.value
                 userAddSuffix(value)
             }
@@ -45,20 +51,20 @@
                     value = oldData.slice(0, hasStr)
                     
                     //剩余的后缀
-//                  lastStr = data.slice(hasStr + 1)
                     lastStr = oldData.slice(hasStr)
                 }
                 log(hasStr, value, lastStr)
                 return value
             }
             
+            var emailSug = e('#email-sug-wrapper')
             //用户数据加上邮箱后缀
             var userAddSuffix = function(data) {
                 var that = this
                 //处理用户数据
                 data = dealData(data)
                 
-                var emailSug = e('#email-sug-wrapper')
+                
                 emailSug.innerHTML = ''
                 //判断如果为空，就不去执行
                 if(!data) {
@@ -73,8 +79,8 @@
                     //判断是否要输入剩余的字符串
                     if(a.indexOf(lastStr) > -1) {
                         //说明存在，否则显示默认的
-                        reuslt += htmlTemplate(data + a)
-                        
+                        reuslt += htmlTemplate(data + a, i)
+                        //如果是有的话，就去设置first的值
                         first = i
                     }
                 }
@@ -84,7 +90,7 @@
                    for(let j = 0; j < postfixList.length; j++) {
                         var b = '@' + postfixList[j]
                         //说明存在，否则显示默认的
-                        reuslt += htmlTemplate(data + b)
+                        reuslt += htmlTemplate(data + b, j)
                     } 
                 }
                 log('last输出', reuslt)
@@ -93,18 +99,38 @@
             }
             
             //添加单个html字符串
-            var htmlTemplate = function(data) {
-            	var r = `<li>${data}</li>`
+            var htmlTemplate = function(data, id) {
+            	var r = `<li class="hint-li" data-id="${id}">${data}</li>`
             	return r
             }
             
-            //鼠标滑过的效果
+//          //鼠标滑过时，添加背景的效果
             var mouseOver = function() {
                 var that = this
-                bindEvent(e("#email-sug-wrapper"), "mouseover", function () {
-                    log('ok');
+                var highlightClass = 'move-back'
+                bindEvent(emailSug, "mouseover", function (event) {
+					var self = event.target
+					self.classList.add(highlightClass)
                 })
-            }
+                bindEvent(emailSug, "mouseout", function (event) {
+                    var self = event.target
+					self.classList.remove(highlightClass)
+                })
+                
+                bindEvent(emailSug, "click", function (event) {
+                    var self = event.target
+					var id = self.dataset.id
+					var value = self.innerHTML
+					
+					//1.设置input的值
+					idFname.value = value
+					//2.清空下面的列表数据
+					emailSug.innerHTML = ''
+                })
+                
+                
+                
+            }  
             
             
             //自动化测试数据
