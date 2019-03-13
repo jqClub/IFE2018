@@ -3,11 +3,8 @@
     <head>
         <meta charset="utf-8">
         <title></title>
-        <!--第一个要求
-                                当用户没有任何输入时，提示框消失
-                                当用户输入字符后，显示提示框，并且把用户输入的内容自动拼上邮箱后缀进行显示
-                                暂时不用考虑示意图中的红色和蓝色背景色的逻辑
-                                注意用户输入中前后空格需要去除
+        <!--第二个要求
+                                当用户输入含有 @ 符号时，我们选取用户输入的@前面的字符来和后缀拼接
         -->
     </head>
     <body>
@@ -17,8 +14,7 @@
             </ul>
         </div>
         <script type="text/javascript" src="../js/util.js"></script>
-        <script type="text/javascript">
-            
+        <script type="text/javascript">  
             // 邮箱后缀List参考
             var postfixList = ['163.com', 'gmail.com', '126.com', 'qq.com', '263.net'];
             <!-- 通过一个小练习综合运用 HTML、CSS、JavaScript，我们要实现一个邮箱输入的提示功能。最终示意图： -->
@@ -33,16 +29,22 @@
             
             //处理用户输入的数据
             var dealData = function(data) {
-                //去除前后的空格，或者使用str.trim()方法
+                //1.去除前后的空格，或者使用str.trim()方法
 //              value = value.replace(/^\s+|\s+$/g,"")
                 data = data.trim()
+                
+//              2. 当用户输入含有 @ 符号时，我们选取用户输入的@前面的字符来和后缀拼接
+                var hasStr = data.indexOf('@')
+                if(hasStr > -1) {
+                    //说明是有的，切片
+                    data = data.slice(0, hasStr)
+                }
                 return data
             }
             
             //用户数据加上邮箱后缀
             var userAddSuffix = function(data) {
                 var that = this
-                
                 //处理用户数据
                 data = dealData(data)
                 
@@ -69,8 +71,15 @@
             }
             
             
+            //自动化测试数据
+            var testData = function() {
+                userAddSuffix('@1')
+                userAddSuffix('a@1')
+                userAddSuffix('ab@1')
+                userAddSuffix('abc@1')
+            }
             var __main = function() {
-            	
+//          	testData()
             }
             __main()
         </script>
