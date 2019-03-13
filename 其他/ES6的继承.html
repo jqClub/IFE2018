@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>ES6的继承</title>
+    </head>
+    <body>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript">
+//      	es6引入了class、extends、super、static(部分为ES2016标准)
+
+        	class Person {
+        		constructor(name) {
+        			this.name = name
+        			this.sCount++
+        		}
+        		getName() {
+        			log(this.name)
+        		}
+        		static sTest() {
+        			log('-静态方法-')
+        		}
+        		//使用静态new的方法，而不使用new
+        		static new(name) {
+			        let i = new this(name)
+			        return i
+			    }
+        	}
+        	
+        	class Man extends Person{
+        		constructor(name) {
+//      			构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
+        			super(name)
+        			this.sex = "male"
+        		}	
+        	}
+        	
+            var __main = function() {
+//				var man = new Man('Davin')
+//				man.getName()
+//				log(man.sex)
+//				Man.sTest()
+				
+				var man = Man.new('Davin')
+				man.getName()
+				log(man.sex)
+				Man.sTest()
+            }
+            __main()
+        </script>
+    </body>
+</html>
