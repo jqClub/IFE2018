@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <!--第5个要求
+			一进入页面就将焦点放在输入框中
+			用户点击鼠标，进行提示选择后，焦点依然在输入框中
+			用户按ESC键的时候，对用户输入进行全选
+			对你还能想到的其它用户体验的方式进行优化
+        -->
+        <style>
+        	/*默认选中第一个的样式*/
+        	.checked {
+        		background: #333333;
+        	}
+        	/*鼠标移上去后，显示的样式*/
+        	.move-back {
+        		background: red;
+        	}
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <input autofocus="autofocus" type="text" id="email-input" oninput="changeEventHandler()">
+            <ul id="email-sug-wrapper" class="email-sug">
+            </ul>
+        </div>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript">  
+            // 邮箱后缀List参考
+            var postfixList = ['163.com', 'gmail.com', '126.com', 'qq.com', '263.net'];
+//          <!-- 通过一个小练习综合运用 HTML、CSS、JavaScript，我们要实现一个邮箱输入的提示功能。最终示意图： -->
+			
+			var idFname = e('#email-input')
+			//获取用户的输入值
+            function changeEventHandler(){
+                
+                var value = idFname.value
+                userAddSuffix(value)
+            }
+            
+            var lastStr = ''
+            //处理用户输入的数据
+            var dealData = function(data) {
+                lastStr = ''
+                //1.去除前后的空格，或者使用str.trim()方法
+//              value = value.replace(/^\s+|\s+$/g,"")
+                var value = data.trim()
+                
+//              2. 当用户输入含有 @ 符号时，我们选取用户输入的@前面的字符来和后缀拼接
+                var hasStr = value.indexOf('@')
+                if(hasStr > -1) {
+                    var oldData = value
+                    //说明是有的，切片
+                    value = oldData.slice(0, hasStr)
+                    
+                    //剩余的后缀
+                    lastStr = oldData.slice(hasStr)
+                }
+//              log(hasStr, value, lastStr)
+                return value
+            }
+            
+            var emailSug = e('#email-sug-wrapper')
+//          所有满足条件的数据
+			var satisfyData = []
+            //用户数据加上邮箱后缀
+            var userAddSuffix = function(data) {
+                var that = this
+                //处理用户数据
+                data = dealData(data)
+                
+                emailSug.innerHTML = ''
+                satisfyData = []
+                //判断如果为空，就不去执行
+                if(!data) {
+                    return
+                }
+                
+                let first = 0
+                //添加html文件
+                var reuslt = ''
+                for(let i = 0; i < postfixList.length; i++) {
+                    var a = '@' + postfixList[i]
+                    //判断是否要输入剩余的字符串
+                    if(a.indexOf(lastStr) > -1) {
+                        //说明存在，否则显示默认的
+//                      reuslt += htmlTemplate(data + a, i)
+						satisfyData.push(data + a)
+                        //如果是有的话，就去设置first的值
+                        first = i
+                    }
+                }
+                
+                //判断如果是不存在的，就显示全部的结果
+                if(!first) {
+                   for(let j = 0; j < postfixList.length; j++) {
+                        var b = '@' + postfixList[j]
+                        //说明存在，否则显示默认的
+//                      reuslt += htmlTemplate(data + b, j)
+						satisfyData.push(data + b)
+                    } 
+                }
+//              log('last输出', reuslt)
+
+                //遍历循环数组
+                satisfyData.map(function(value,key,arr){
+				  	reuslt += htmlTemplate(value, key)
+				})
+                //将所有的，都插入到页面中去
+                insertContent(emailSug, reuslt)
+            }
+            
+            var chooseId = 0
+            var chooseClass = 'checked'
+            //添加单个html字符串
+            var htmlTemplate = function(data, id) {
+            	var r = `<li id="choose${id + 1}" class="satisfy" data-id="${id + 1}">${data}</li>`
+            	if(!id) {
+            		chooseId = (id + 1)
+            		r = `<li id="choose${id + 1}" class="satisfy checked" data-id="${id + 1}">${data}</li>`
+            	}
+            	
+            	return r
+            }
+            
+//          //鼠标滑过时，添加背景的效果
+           	var highlightClass = 'move-back'
+            bindEvent(emailSug, "mouseover", function (event) {
+				var self = event.target
+				var id = self.dataset.id
+				if(id) {
+					self.classList.add(highlightClass)
+				}
+            })
+            //移除的时候，去除背景颜色
+            bindEvent(emailSug, "mouseout", function (event) {
+                var self = event.target
+                var id = self.dataset.id
+                if(id) {
+					self.classList.remove(highlightClass)
+				}
+            })
+            
+            bindEvent(emailSug, "click", function (event) {
+                var self = event.target
+				var id = self.dataset.id
+				var value = self.innerHTML
+				
+				//判断是否是点击的列表数据
+				if(self.dataset.id) {
+					setInput(value)
+				}
+            })
+            var setInput = function(value) {
+            	//1.设置input的值
+				idFname.value = value
+				//2.清空下面的列表数据
+				emailSug.innerHTML = ''
+				
+				//3.设置自动聚焦的功能
+				idFname.focus()
+            }
+            
+            bindEvent(e('body'), 'keydown', function(e) {
+            	log(e.key)
+            	keyEvent(e.key)
+            })
+            //按确定键的时候
+            bindEvent(e('body'), 'Enter', function(e) {
+            	log(e.key)
+            	keyEvent(e.key)
+            })
+            //按确定键的时候
+            bindEvent(e('body'), 'Escape', function(e) {
+            	log(e.key)
+            	keyEvent(e.key)
+            })
+            
+            //所有的按键事件
+            var keyEvent = function(type) {
+            	if(!type) {
+            		return
+            	}
+            	satisfyData = satisfyData || []
+            	if(!satisfyData.length) {
+            		return
+            	}
+            	
+            	var result = {
+            		//向上按键
+            		ArrowUp: function() {
+						var self = this
+						chooseId += 1
+						self.dataLimit()
+						self.changeData()
+            		},
+            		//向下按键
+            		ArrowDown: function() {
+						var self = this
+						chooseId -= 1
+						self.changeData()
+            		},
+            		
+            		Enter: function() {
+            			var self = this
+            			var value = satisfyData[chooseId-1]
+            			setInput(value)
+            		},
+            		//按退出键的时候，全选用户输入
+            		Escape: function() {
+            			var self = this
+            			//4.全选用户的输入
+						idFname.select()
+            		},
+            		changeData: function() {
+            			var self = this
+            			var id = self.dataLimit()
+						self.changeClass()
+						self.addClass()
+            		},	
+            		//判断是否有到上下限制
+            		dataLimit: function() {
+            			var self = this
+            			satisfyData = satisfyData || []
+            			var len = satisfyData.length
+            			if(chooseId <= 0) {
+            				chooseId = len
+            			} 
+            			if (chooseId > len) {
+            				chooseId = 1
+            			}
+            			return chooseId
+            		},
+            		//修改样式
+            		changeClass: function() {
+            			var self = this
+            			
+            			var len = es('.satisfy').length
+            			for(var i = 0; i < len; i++) {
+            				var a = es('.satisfy')[i]
+            				a.classList.remove(chooseClass)
+            			}
+            		},
+            		//新增上样式
+            		addClass: function() {
+            			var self = this 
+            			var a = e(`#choose${chooseId}`)
+            			a.classList.add(chooseClass)
+            		},
+            	}
+            	try {
+				    result[type]()
+				}
+				catch(err) {
+				   
+				}
+            }
+            
+            
+            //自动化测试数据
+            var testData = function() {
+                userAddSuffix('a@1')
+                userAddSuffix('a@g')
+                userAddSuffix('a@2')
+                userAddSuffix('a@qq')
+                userAddSuffix('a@163')
+                userAddSuffix('a@126.com')
+                userAddSuffix('a@qq.com  ')
+                userAddSuffix('a@qq.comm')
+            }
+            var __main = function() {
+//          	testData()
+//              mouseOver()
+            }
+            __main()
+        </script>
+    </body>
+</html>

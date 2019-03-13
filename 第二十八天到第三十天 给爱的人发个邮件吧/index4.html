@@ -4,18 +4,27 @@
         <meta charset="utf-8">
         <title></title>
         <!--第4个要求
-            1.使用CSS实现：鼠标滑过提示框的某一个提示时，这个提示内容背景色变化，表示鼠标经过了这个DOM节点
-            2. 鼠标如果点击某个提示，则提示内容进入输入框，同时提示框消失
-            3.在上个步骤结束后，在输入框中任意再输入字符或删除字符，则重新开始出现提示框
+			我们给提示框加上3个按键的功能，分别是回车和上下键，使得可以通过键盘操作进行提示框的选择
+
+			当有提示框的时候，默认第一个提示为被选择状态，用一个和鼠标滑过不一样的背景色来标识
+			当有输入框的时候，按上键，可以向上移动选择状态，如果按键之前的被选择提示是第一个，则被选状态移到最下面一个
+			当有输入框的时候，按下键，可以向下移动选择状态，如果按键之前的被选择提示是最后一个，则被选状态移到第一个
+			当有输入框时，按回车键，则将当前被选中状态的提示内容，放到输入框中，并隐藏提示框
+			当没有输入框的时候，这3个键盘按键无响应
+			当用户输入发生改变的时候，选择状态都重新切回到第一个提示
         -->
         <style>
+        	/*默认选中第一个的样式*/
+        	.checked {
+        		background: #333333;
+        	}
+        	/*鼠标移上去后，显示的样式*/
         	.move-back {
         		background: red;
         	}
         </style>
     </head>
     <body>
-    	
         <div class="wrapper">
             <input type="text" id="email-input" oninput="changeEventHandler()">
             <ul id="email-sug-wrapper" class="email-sug">
@@ -53,19 +62,21 @@
                     //剩余的后缀
                     lastStr = oldData.slice(hasStr)
                 }
-                log(hasStr, value, lastStr)
+//              log(hasStr, value, lastStr)
                 return value
             }
             
             var emailSug = e('#email-sug-wrapper')
+//          所有满足条件的数据
+			var satisfyData = []
             //用户数据加上邮箱后缀
             var userAddSuffix = function(data) {
                 var that = this
                 //处理用户数据
                 data = dealData(data)
                 
-                
                 emailSug.innerHTML = ''
+                satisfyData = []
                 //判断如果为空，就不去执行
                 if(!data) {
                     return
@@ -79,7 +90,8 @@
                     //判断是否要输入剩余的字符串
                     if(a.indexOf(lastStr) > -1) {
                         //说明存在，否则显示默认的
-                        reuslt += htmlTemplate(data + a, i)
+//                      reuslt += htmlTemplate(data + a, i)
+						satisfyData.push(data + a)
                         //如果是有的话，就去设置first的值
                         first = i
                     }
@@ -90,31 +102,47 @@
                    for(let j = 0; j < postfixList.length; j++) {
                         var b = '@' + postfixList[j]
                         //说明存在，否则显示默认的
-                        reuslt += htmlTemplate(data + b, j)
+//                      reuslt += htmlTemplate(data + b, j)
+						satisfyData.push(data + b)
                     } 
                 }
-                log('last输出', reuslt)
-                //插入到页面中去
+//              log('last输出', reuslt)
+
+                //遍历循环数组
+                satisfyData.map(function(value,key,arr){
+				  	reuslt += htmlTemplate(value, key)
+				})
+                //将所有的，都插入到页面中去
                 insertContent(emailSug, reuslt)
             }
             
+            var chooseId = 0
+            var chooseClass = 'checked'
             //添加单个html字符串
             var htmlTemplate = function(data, id) {
-            	var r = `<li data-id="${id + 1}">${data}</li>`
+            	var r = `<li id="choose${id + 1}" class="satisfy" data-id="${id + 1}">${data}</li>`
+            	if(!id) {
+            		chooseId = (id + 1)
+            		r = `<li id="choose${id + 1}" class="satisfy checked" data-id="${id + 1}">${data}</li>`
+            	}
+            	
             	return r
             }
             
 //          //鼠标滑过时，添加背景的效果
-           var highlightClass = 'move-back'
+           	var highlightClass = 'move-back'
             bindEvent(emailSug, "mouseover", function (event) {
 				var self = event.target
-				if(self.dataset.id) {
+				var id = self.dataset.id
+				if(id) {
 					self.classList.add(highlightClass)
 				}
             })
+            //移除的时候，去除背景颜色
             bindEvent(emailSug, "mouseout", function (event) {
                 var self = event.target
-                if(self.dataset.id) {
+                var id = self.dataset.id
+                if(id) {
 					self.classList.remove(highlightClass)
 				}
             })
@@ -132,6 +160,92 @@
 					emailSug.innerHTML = ''
 				}
             })
+            
+            bindEvent(e('body'), 'keydown', function(e) {
+            	log(e.key)
+            	keyEvent(e.key)
+            })
+            //按确定键的时候
+            bindEvent(e('body'), 'Enter', function(e) {
+            	log(e.key)
+            	keyEvent(e.key)
+            })
+            //所有的按键事件
+            var keyEvent = function(type) {
+            	if(!type) {
+            		return
+            	}
+            	satisfyData = satisfyData || []
+            	if(!satisfyData.length) {
+            		return
+            	}
+            	
+            	var result = {
+            		//向上按键
+            		ArrowUp: function() {
+						var self = this
+						chooseId += 1
+						self.dataLimit()
+						self.changeData()
+            		},
+            		//向下按键
+            		ArrowDown: function() {
+						var self = this
+						chooseId -= 1
+						self.changeData()
+            		},
+            		changeData: function() {
+            			var self = this
+            			var id = self.dataLimit()
+						self.changeClass()
+						self.addClass()
+            		},
+            		Enter: function() {
+            			var self = this
+            			var value = satisfyData[chooseId-1]
+            			//判断是否是点击的列表数据
+						//1.设置input的值
+						idFname.value = value
+						//2.清空下面的列表数据
+						emailSug.innerHTML = ''
+            		},
+            		//判断是否有到上下限制
+            		dataLimit: function() {
+            			var self = this
+            			satisfyData = satisfyData || []
+            			var len = satisfyData.length
+            			if(chooseId <= 0) {
+            				chooseId = len
+            			} 
+            			if (chooseId > len) {
+            				chooseId = 1
+            			}
+            			return chooseId
+            		},
+            		//修改样式
+            		changeClass: function() {
+            			var self = this
+            			
+            			var len = es('.satisfy').length
+            			for(var i = 0; i < len; i++) {
+            				var a = es('.satisfy')[i]
+            				a.classList.remove(chooseClass)
+            			}
+            		},
+            		//新增上样式
+            		addClass: function() {
+            			var self = this 
+            			var a = e(`#choose${chooseId}`)
+            			a.classList.add(chooseClass)
+            		},
+            	}
+            	try {
+				    result[type]()
+				}
+				catch(err) {
+				   
+				}
+            }
             
             
             //自动化测试数据
