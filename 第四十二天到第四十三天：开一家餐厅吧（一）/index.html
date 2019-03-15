@@ -22,7 +22,165 @@
         </div>
         <script type="text/javascript" src="../js/util.js"></script>
         <script type="text/javascript">
-    
+        	//使用的是ES5的组合继承的方法
+        	var id = 0
+        	
+        	//餐厅类：
+			//属性：金钱，座位数量、职员列表
+			//方法：招聘职员，解雇职员
+    		var Restaurant = function(obj) {
+    			var that = this
+    			this.cash = obj.cash
+    			this.seats = obj.seats
+    			this.staff = obj.staff || []
+    		}
+    		Restaurant.prototype.hire = function(obj) {
+    			var that = this
+    			log('招聘职员', obj)
+    			that.staff.push(obj)
+    		}
+    		
+    		Restaurant.prototype.fire = function(obj) {
+    			var that = this
+    			log('解雇职员', obj)
+    			var staff = that.staff
+    			var len = staff.length
+    			var findIndex = -1
+    			for(var i = 0; i < len; i++) {
+    				var a = staff[i]
+    				if(a.id == obj.id) {
+    					//说明找到了，删除
+    					findIndex = i
+    				}
+    			}
+    			
+    			if(findIndex == -1) {
+    				//说明没有
+    				return '没有找到'
+    			} else {
+					//说明有,删除
+					staff.splice(findIndex, 1)
+					return '删除成功'
+    			}
+    		}
+    		
+    		//职员类：
+			//属性：ID，姓名，工资
+			//方法：完成一次工作
+			var Worker = function(obj) {
+				this.id = id++
+    			this.name = obj.name
+    			this.salary = obj.salary
+			}
+			Worker.prototype.finishJob = function() {
+    			log('完成一次工作')
+    		}
+			
+			//服务员类，继承自职员
+			//完成一次工作：如果参数是个数组，则记录客人点菜，如果参数不是数组则是上菜行为
+			function Waiter(name, salary){
+//			  Worker.apply(this,arguments)
+				Worker.call(this, {
+					name, 
+					salary,
+				})
+			}
+			//继承原型
+			Waiter.prototype = Object.create(Worker.prototype)
+			//constructor是类的构造函数，我们发现，Person和Man实例的constructor指向都是Person，当然，这并不会改变instanceof的结果，
+			//但是对于需要用到construcor的场景，就会有问题。所以一般我们会加上这么一句：
+			Waiter.prototype.constructor = Waiter
+			Waiter.prototype.finishJob = function() {
+				var first = arguments[0]
+				if(typeof first == 'object') {
+					//说明是点菜
+					log('如果参数是个数组，则记录客人点菜')
+				} else {
+					//说明是上菜
+					log('如果参数不是数组则是上菜行为')
+				}
+			}
+			
+			
+			//厨师类，继承自职员
+			//完成一次工作：烹饪出菜品
+			function Cook(name, salary){
+				Worker.call(this, {
+					name, 
+					salary,
+				})
+			}
+			//继承原型
+			Cook.prototype = Object.create(Worker.prototype)
+			//constructor是类的构造函数，我们发现，Person和Man实例的constructor指向都是Person，当然，这并不会改变instanceof的结果，
+			//但是对于需要用到construcor的场景，就会有问题。所以一般我们会加上这么一句：
+			Cook.prototype.constructor = Cook
+			Cook.prototype.finishJob = function() {
+				log('烹饪出菜品')
+			}
+			
+			
+			//顾客类
+			//方法：点菜，吃
+			var Customer = function(orders) {
+				this.orders = orders
+			}
+			Customer.prototype.order = function(obj) {
+    			log('用户点菜')
+    			this.orders.push(obj)
+    		}
+			Customer.prototype.eat = function(obj) {
+    			log('用户吃')
+    			//
+    		}
+			
+			var foods = []
+			//菜品类
+			//属性：名字、烹饪成本、价格
+			var Food = function(obj) {
+				this.name = obj.name
+				this.cost = obj.cost
+				this.expenditure = obj.expenditure
+			}
+			///////////////////////////////////////////////
+			///////////////////////////////////////////////
+			//1.创建一个餐厅
+        	var ifeRestaurant = new Restaurant({
+			    cash: 1000000,
+			    seats: 20,
+			    staff: []
+			});		
+			//创建1个服务员， 1个厨师
+			var newCook = new Cook("Tony", 10000);
+			var newCook1 = new Cook("mary", 10000);
+			var newWaiter = new Waiter("haha", 10000);
+//			//招聘1个服务员
+			ifeRestaurant.hire(newCook);
+			ifeRestaurant.hire(newCook1);
+//			//招聘1个厨师
+			ifeRestaurant.hire(newWaiter);
+////			
+			console.log(ifeRestaurant.staff);
+////		开除其中一个服务员
+			ifeRestaurant.fire(newCook1);
+			console.log(ifeRestaurant.staff);
+			
+			//生成菜单
+			var creatFoods = function() {
+				var that = this
+				var len = 10
+				for(var i = 0; i < len; i++) {
+    				var food = new Food({
+    					name: '空心菜',
+    					cost: 50,
+    					expenditure: 25,
+    				})
+    			}
+			}
+
+//			//2.用户来点菜
+//			var newCustomer = new Customer('')
+			
             var __main = function() {
             	
             }

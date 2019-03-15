@@ -7,7 +7,11 @@
     <body>
         <script type="text/javascript" src="../js/util.js"></script>
         <script type="text/javascript">
-//      	es6引入了class、extends、super、static(部分为ES2016标准)
+			//es6引入了class、extends、super、static(部分为ES2016标准)
+			//ES6继承不足
+			//1.不支持静态属性(除函数)
+			//2.class中不能定义私有变量和函数。class中定义的所有函数都会被放倒原型当中，都会被子类继承，而属性都会作为实例属性挂到this上。
+			//如果子类想定义一个私有的方法或定义一个private 变量，便不能直接在class花括号内定义，这真的很不方便！
 
         	class Person {
         		constructor(name) {
