@@ -1,3 +1,5 @@
+//每一个时间单位是 1 秒
+var oneUnitOfTime = 100
 var id = 0
             
 var CreatCingleFun = function(fu) {
@@ -183,10 +185,10 @@ class Cook extends Worker{
     finishOne(food) {
         return new Promise(function (resolve, reject) {
             var name = food.name
-            log('-烹饪出菜品-', name)
+            log('-烹饪出菜品-', name, )
             setTimeout(function() {
                 resolve(food)
-            }, 500);
+            }, food.time * oneUnitOfTime);
         });
     }
     finishJob(ifeRestaurant) {
@@ -207,13 +209,25 @@ class Customer{
 
     }
     order(foods) {
-        for(var i = 0; i < foods.length; i++) {
-            var food = foods[i]
-            log('-用户点菜-', food.name)
-        }
+        return new Promise(function (resolve, reject) {
+            setTimeout(function() {
+                for(var i = 0; i < foods.length; i++) {
+                    var food = foods[i]
+                    log('-用户点菜-', food.name)
+                }
+                resolve()
+            }, 3 * oneUnitOfTime);
+        }); 
+        
     }
     eat(food) {
-        log('-用户吃-', food.name)
+        log('-用户开始吃-', food.name)
+        return new Promise(function (resolve, reject) {
+            setTimeout(function() {
+                log('-用户吃完-', food.name)
+                resolve()
+            }, 3 * oneUnitOfTime);
+        }); 
     }
 }
 

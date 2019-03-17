@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>最简单的餐厅(三)</title>
+        <!--第一个：最简单的餐厅：
+                                    在真实世界中，点菜、烹饪、用餐都是需要时间的，我们给我们的餐厅加上时间的因素。
+
+                                    我们假设每一个时间单位是 1 秒（可配置）。
+                                    
+                                    点菜需要 3 个时间单位
+                                    做菜的时间不一定，每个菜需要的时间不一样，所以需要在菜单的数据中添加一个字段，描述这个菜需要用的时间，比如在 1-10 个时间单位这个区间
+                                    用餐时间，每个菜的用餐时间为 3 个时间单位，如果顾客点了 n 个菜，则需要 3 * n 个时间单位
+                                    我们再做一些小调整，顾客点菜不一定只点一个了，可以是多个菜
+        -->
+    </head>
+    <body>
+        <div class="wrapper">
+            <!--<textarea id="id-text-log" name="" rows="20" cols="40"></textarea>-->
+        </div>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript" src="./data.js"></script>
+        <script type="text/javascript" src="./class_crear.js"></script>
+        <script type="text/javascript">
+            
+           
+			//创建一个菜单
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            var __main = function() {
+//              使用了单例模式来创建一个实例对象
+//              //1.创建一个餐厅
+                var ifeRestaurant = new Restaurant({
+                    cash: 100,
+                    seats: 20,
+                    staff: []
+                });
+                log('-创建餐厅-', ifeRestaurant)
+
+ //             //创建1个服务员， 1个厨师
+                var newCook =  new Cook("mary", 10000);
+                var newWaiter = new Waiter("haha", 10000);
+                //招聘职员
+                ifeRestaurant.hire(newCook)
+                ifeRestaurant.hire(newWaiter)
+                log('-所有的职员-', ifeRestaurant.staff)
+
+//              // 创建一个顾客
+                var customer = new Customer()
+//              // 2.顾客下单
+//              数组中随机取一个值
+                var foods = getRandomArrayElements(foodList, 2)
+                log('用户开始点菜')
+                customer.order(foods).then(function() {
+                    log('用户结束点菜')
+                    //              // 3.服务员下单
+                    newWaiter.finishJob(foods, ifeRestaurant)   
+    //              // 4.厨师来做菜
+                    var finshLast = function(food) {
+                        //                  // 5.服务员上菜
+                        newWaiter.finishJob(food)
+                        //              // 6.用户吃饭
+                        customer.eat(food).then(function() {
+                             //删除餐厅已点的菜
+                            ifeRestaurant.foodAbout({
+                               type: 'remove',
+                               food: food
+                            })
+                        })
+                    }
+                    var promiseAll = newCook.finishJob(ifeRestaurant)
+                    for(var i = 0; i < promiseAll.length; i++) {
+                        var a = promiseAll[i]
+                        a.then(function(food) {
+                            finshLast(food)
+                        })
+                    }
+                })
+            }
+            __main()
+        </script>
+    </body>
+</html>
