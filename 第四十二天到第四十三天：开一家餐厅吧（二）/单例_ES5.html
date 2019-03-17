@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>
+                                    单例模式 
+        </title>
+        <!--参考 链接：   
+            https://www.cnblogs.com/giggle/p/5452271.html
+            https://blog.csdn.net/yisuowushinian/article/details/52003127
+            https://segmentfault.com/a/1190000013864944
+            -->
+        <!--所谓单例模式，顾名思义即一个类只有一个实例。所以，当我们创建一个实例时，就必须判断其是否已经存在了这个实例，
+                                如果已经存在了这个实例，那么就返回这个已经存在的实例，无需再创建一个（单例模式嘛，核心就是一个类只有一个 实例）；
+                                如果不存在，就创建这个实例咯。-->
+    </head>
+    <body>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript">
+            //类：SupposeClass
+           
+
+//			//方法1，利用闭包来实现,直接返回一个对象，如果存在的话，就不用去实例化了
+////			核心思路：利用Javascript的作用域，形成闭包，从而可以创建私有变量（假设我们将这个私有变量取名为instance），然后将创建的实例赋予这个私有变量instance就ok了。
+////			每当想创建这个类的实例时，先判断instance是否已经引用了存在的实例，
+////			如果没有引用，即这个类没有被创建实例，so创建一个实例，然后将其赋予给instance；
+////          如果instance已经引用，即已存在了该类的实例，so无需再创建，直接使用这个instance就ok了。
+//			var singletonAccepter = function() {
+//			    var result = null
+//			    
+//              function SupposeClass( args ){
+//                  var args = args || {};
+//                  this.name = args.name || 'Monkey';
+//                  this.age = args.age || 24;
+//              };
+//              
+//              
+//              return {
+//                  first : function() {
+//                      if(!result) {
+//                          result = new SupposeClass()
+//                      }
+//                      return result
+//                  }
+//              }
+//			}()         
+//          singletonAccepter.first()
+//          singletonAccepter.first()
+			
+			
+//			方法2利用属性来判断是否已存在实例。
+			function singletonAccepter( args ){
+//              //判断Universe.instance是否已存在实例
+                if(typeof singletonAccepter.instance === 'object'){
+                    return singletonAccepter.instance;
+                }
+                this.name = args.name || 'Monkey';
+                this.age = args.age || 24;
+                singletonAccepter.instance = this;
+            };
+            singletonAccepter.prototype = {
+                constructor: singletonAccepter,
+                displayInfo: function(){
+                    console.log('name: ' + this.name + '   age: ' + this.age);
+                }
+            };
+
+//          方法3
+//在Javascript的世界里，this是引用的对象。
+//还记得JavaScript是怎么通过new创建对象的么？ 
+//new:
+//　　1、创建一个新的对象，这个对象的类型时object;
+//　　2、将这个对象的__proto__隐指针指向原型prototype;
+//　　3、执行构造函数，当this被提及的时候，代表新创建的对象;
+//　　4、返回新创建的对象。
+//　　注：倘若在最后return了，那么return的是基本类型，例如3，则无效；否则是引用类型，则返回这个引用类型。
+//
+//注意第3点了么？
+//
+//当new后，this代表新创建的对象。so，我们可以利用闭包，在类中声明一个变量instance来引用创建的实例。然后再重写类，就OK啦
+
+//          var singletonAccepter = function(arg) {
+//              var instance = null 
+//             var arg = arg || {}
+//             this.name = arg.name || 'mokey'
+//             this.age  = arg.age  || 'mokey'
+//             
+//             instance = this
+//             //重写这个函数
+//             singletonAccepter = function() {
+//                 return instance
+//             }
+//          }    	
+            var __main = function() {
+                var a = new singletonAccepter({
+                    name: 'haha',
+                    age: 28,
+                })
+                var b = new singletonAccepter({
+                    name: 'meimei',
+                    age: 18,
+                })
+                log(a.name)
+                log(b.name) 
+            }
+            __main()
+        </script>
+    </body>
+</html>

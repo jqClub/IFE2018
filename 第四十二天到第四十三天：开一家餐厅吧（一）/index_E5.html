@@ -79,7 +79,6 @@
 			//服务员类，继承自职员
 			//完成一次工作：如果参数是个数组，则记录客人点菜，如果参数不是数组则是上菜行为
 			function Waiter(name, salary){
-//			  Worker.apply(this,arguments)
 				Worker.call(this, {
 					name, 
 					salary,
@@ -143,43 +142,44 @@
 				this.expenditure = obj.expenditure
 			}
 			///////////////////////////////////////////////
-			///////////////////////////////////////////////
-			//1.创建一个餐厅
-        	var ifeRestaurant = new Restaurant({
-			    cash: 1000000,
-			    seats: 20,
-			    staff: []
-			});		
-			//创建1个服务员， 1个厨师
-			var newCook = new Cook("Tony", 10000);
-			var newCook1 = new Cook("mary", 10000);
-			var newWaiter = new Waiter("haha", 10000);
-//			//招聘1个服务员
-			ifeRestaurant.hire(newCook);
-			ifeRestaurant.hire(newCook1);
-//			//招聘1个厨师
-			ifeRestaurant.hire(newWaiter);
-////			
-			console.log(ifeRestaurant.staff);
-////		开除其中一个服务员
-			ifeRestaurant.fire(newCook1);
-			console.log(ifeRestaurant.staff);
-			
-			//生成菜单
-			var creatFoods = function() {
-				var that = this
-				var len = 10
-				for(var i = 0; i < len; i++) {
-    				var food = new Food({
-    					name: '空心菜',
-    					cost: 50,
-    					expenditure: 25,
-    				})
-    			}
-			}
-
-//			//2.用户来点菜
-//			var newCustomer = new Customer('')
+            ///////////////////////////////////////////////
+            //1.创建一个餐厅
+            var ifeRestaurant = new Restaurant({
+                cash: 1000000,
+                seats: 20,
+                staff: []
+            });     
+            //创建1个服务员， 1个厨师
+            var newCook = new Cook("Tony", 10000);
+            var newCook1 = new Cook("mary", 10000);
+            var newWaiter = new Waiter("haha", 10000);
+//          //招聘1个服务员
+            ifeRestaurant.hire(newCook);
+            ifeRestaurant.hire(newCook1);
+//          //招聘1个厨师
+            ifeRestaurant.hire(newWaiter);
+////            
+            console.log(ifeRestaurant.staff);
+////        开除其中一个服务员
+            ifeRestaurant.fire(newCook1);
+            console.log(ifeRestaurant.staff);
+            
+            //生成菜单
+            var creatFoods = function() {
+                var that = this
+                var res = []
+                var len = 10
+                for(var i = 0; i < len; i++) {
+                    var food = new Food({
+                        name: '空心菜' + i,
+                        cost: 50 + (10 * i),
+                        expenditure: 25,
+                    })
+                    res.push(food)
+                }
+                log('-所有的菜单-', res)
+            }
+            creatFoods()
 			
             var __main = function() {
             	

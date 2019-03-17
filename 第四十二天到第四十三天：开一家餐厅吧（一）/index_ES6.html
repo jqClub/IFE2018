@@ -22,6 +22,8 @@
         </div>
         <script type="text/javascript" src="../js/util.js"></script>
         <script type="text/javascript">
+            var id = 0
+            
         	//使用的是ES6方法
         	class Restaurant {
         		constructor(obj) {
@@ -29,11 +31,33 @@
 	    			this.seats = obj.seats
 	    			this.staff = obj.staff
         		}
-        		hire() {
-        			log('招聘职员')
+        		hire(obj) {
+        		    var that = this
+        			log('招聘职员', obj)
+                    that.staff.push(obj)
         		}
-        		fire() {
-        			log('解雇职员')
+        		fire(obj) {
+        			var that = this
+                    log('解雇职员', obj)
+                    var staff = that.staff
+                    var len = staff.length
+                    var findIndex = -1
+                    for(var i = 0; i < len; i++) {
+                        var a = staff[i]
+                        if(a.id == obj.id) {
+                            //说明找到了，删除
+                            findIndex = i
+                        }
+                    }
+                    
+                    if(findIndex == -1) {
+                        //说明没有
+                        return '没有找到'
+                    } else {
+                        //说明有,删除
+                        staff.splice(findIndex, 1)
+                        return '删除成功'
+                    }
         		}
         		//使用静态new的方法，而不使用new
         		static new(obj) {
@@ -47,15 +71,12 @@
 			//方法：完成一次工作
 			class Worker {
         		constructor(obj) {
-        			this.id = obj.id
+        			this.id = id++
 	    			this.name = obj.name
 	    			this.salary = obj.salary
         		}
         		finishJob() {
         			log('完成一次工作')
-        		}
-        		fire() {
-        			log('解雇职员')
         		}
         		//使用静态new的方法，而不使用new
         		static new(obj) {
@@ -67,9 +88,12 @@
 			//服务员类，继承自职员
 			//完成一次工作：如果参数是个数组，则记录客人点菜，如果参数不是数组则是上菜行为
 			class Waiter extends Worker{
-        		constructor(name) {
+        		constructor(name, salary) {
 //      			构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
-        			super(name)
+        			super({
+        			    name, 
+                        salary,
+        			})
         		}
         		finishJob() {
         			var first = arguments[0]
@@ -86,10 +110,13 @@
 			//厨师类，继承自职员
 			//完成一次工作：烹饪出菜品
 			class Cook extends Worker{
-        		constructor(name) {
-//      			构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
-        			super(name)
-        		}
+        		constructor(name, salary) {
+//                  构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
+                    super({
+                        name, 
+                        salary,
+                    })
+                }
         		finishJob() {
         			log('烹饪出菜品')
         		}
@@ -117,61 +144,47 @@
 					this.cost = obj.cost
 					this.expenditure = obj.expenditure
         		}
-        	}
-			///////////////////////////////////////////////
-			///////////////////////////////////////////////
-			//菜品1
-    		var food = new Food({
-    			name: '辣子鸡',
-    			cost: 50,
-    			expenditure: 25,
-    		});
-    		log(food)
+            }
 			
-			//顾客
-    		var customer = new Customer({});
-			customer.order()
-			customer.eat()
-//			
-			//厨师2
-    		var cook = new Cook({
-			    id: 2,
-			    name: 'hanmeimei',
-			    salary: 1000,
-			});
-			cook.finishJob();
-			
-			
-			//服务员1
-    		var waiter = new Waiter({
-			    id: 1,
-			    name: 20,
-			    salary: 100,
-			});
-			waiter.finishJob(1, 2, 3, 4);
-			
-			//职员
-			var worker = new Worker({
-			    id: 1,
-			    name: 'haha',
-			    salary: 100,
-			});
-			worker.finishJob();
-			
-
-//      	var ifeRestaurant = new Restaurant({
-//			    cash: 1000000,
-//			    seats: 20,
-//			    staff: []
-//			});
-//			
-//			var newCook = new Cook("Tony", 10000);
-//			ifeRestaurant.hire(newCook);
-//			
-//			console.log(ifeRestaurant.staff);
-//			
-//			ifeRestaurant.fire(newCook);
-//			console.log(ifeRestaurant.staff);
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            //1.创建一个餐厅
+            var ifeRestaurant = new Restaurant({
+                cash: 1000000,
+                seats: 20,
+                staff: []
+            });     
+            //创建1个服务员， 1个厨师
+            var newCook = new Cook("Tony", 10000);
+            var newCook1 = new Cook("mary", 10000);
+            var newWaiter = new Waiter("haha", 10000);
+//          //招聘1个服务员
+            ifeRestaurant.hire(newCook);
+            ifeRestaurant.hire(newCook1);
+//          //招聘1个厨师
+            ifeRestaurant.hire(newWaiter);
+////            
+            console.log(ifeRestaurant.staff);
+////        开除其中一个服务员
+            ifeRestaurant.fire(newCook1);
+            console.log(ifeRestaurant.staff);
+            
+            //生成菜单
+            var creatFoods = function() {
+                var that = this
+                var res = []
+                var len = 10
+                for(var i = 0; i < len; i++) {
+                    var food = new Food({
+                        name: '空心菜' + i,
+                        cost: 50 + (10 * i),
+                        expenditure: 25,
+                    })
+                    res.push(food)
+                }
+                log('-所有的菜单-', res)
+            }
+            creatFoods()
 			
             var __main = function() {
             	

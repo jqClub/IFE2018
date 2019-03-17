@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>第一个：最简单的餐厅(二)</title>
+        <!--第一个：最简单的餐厅：
+                                我们上个任务已经创造了各个角色，现在，我们希望让各个角色动起来。
+
+                                我们假设只有一个厨师，一个服务员，一个座位。而且餐厅老板是个偏执狂，他喜欢简单，他需要保证餐厅永远只有一个厨师，一个服务员和一个座位。
+
+                                整个餐厅的运作流程是这样的，顾客入座，服务员招待顾客点菜，点完菜后告诉厨师，厨师做好菜后服务员上菜，顾客用餐，然后换下一个顾客
+
+                                你需要设计一个菜单，然后设计一个顾客随机点菜的方法
+        -->
+    </head>
+    <body>
+        <div class="wrapper">
+            <textarea id="id-text-log" name="" rows="20" cols="40"></textarea>
+        </div>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript">
+            var id = 0
+            class CreatCingleCase {
+                constructor() {
+                    //方式1：创建一个单例的类，然后让下面去继承他
+                    if(!CreatCingleCase.instan) {
+                        CreatCingleCase.instan = this
+                    }
+                    return CreatCingleCase.instan
+                }
+//*****************************************
+                //方式2：使用静态来创建单例
+                static singleCase(obj) {
+                    if(!this.instan) {
+                       this.instan = new this(obj)
+                    }
+
+                    return this.instan
+                }
+            }
+
+        	//使用的是ES6方法
+        	class Restaurant extends CreatCingleCase {
+        		constructor(obj) {
+//                构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
+                    super()
+
+        			this.cash = obj.cash
+	    			this.seats = obj.seats
+	    			this.staff = obj.staff
+	    			//这里可以不用加上这个
+//	    			this.instan = null
+        		}
+        		hire(obj) {
+        		    var that = this
+        			log('招聘职员', obj)
+                    that.staff.push(obj)
+        		}
+        		fire(obj) {
+        			var that = this
+                    log('解雇职员', obj)
+                    var staff = that.staff
+                    var len = staff.length
+                    var findIndex = -1
+                    for(var i = 0; i < len; i++) {
+                        var a = staff[i]
+                        if(a.id == obj.id) {
+                            //说明找到了，删除
+                            findIndex = i
+                        }
+                    }
+
+                    if(findIndex == -1) {
+                        //说明没有
+                        return '没有找到'
+                    } else {
+                        //说明有,删除
+                        staff.splice(findIndex, 1)
+                        return '删除成功'
+                    }
+        		}
+        		//使用静态new的方法，而不使用new
+        		static new(obj) {
+			        let i = new this(obj)
+			        return i
+			    }
+        	}
+
+        	//职员类：
+			//属性：ID，姓名，工资
+			//方法：完成一次工作
+			class Worker  {
+        		constructor(obj) {
+//      		    //通过super()来继承父类
+//      		    super()
+
+        			this.id = id++
+	    			this.name = obj.name
+	    			this.salary = obj.salary
+        		}
+        		finishJob() {
+        			log('完成一次工作')
+        		}
+        		//使用静态new的方法，而不使用new
+        		static new(obj) {
+			        let i = new this(obj)
+			        return i
+			    }
+       		}
+
+			//服务员类，继承自职员
+			//完成一次工作：如果参数是个数组，则记录客人点菜，如果参数不是数组则是上菜行为
+			class Waiter extends Worker{
+        		constructor(name, salary) {
+//      			构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
+        			super({
+        			    name,
+                        salary,
+        			})
+
+        			//方式1：创建一个单例的类，然后让下面去继承他
+                    if(!Waiter.instan) {
+                        Waiter.instan = this
+                    }
+                    return Waiter.instan
+        		}
+        		finishJob() {
+        			var first = arguments[0]
+					if(typeof first == 'object') {
+						//说明是点菜
+						log('如果参数是个数组，则记录客人点菜')
+					} else {
+						//说明是上菜
+						log('如果参数不是数组则是上菜行为')
+					}
+        		}
+        	}
+
+			//厨师类，继承自职员
+			//完成一次工作：烹饪出菜品
+			class Cook extends Worker{
+        		constructor(name, salary) {
+//                  构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
+                    super({
+                        name,
+                        salary,
+                    })
+
+                    //方式1：创建一个单例的类，然后让下面去继承他
+                    if(!Cook.instan) {
+                        Cook.instan = this
+                    }
+                    return Cook.instan
+                }
+        		finishJob() {
+        			log('烹饪出菜品')
+        		}
+        	}
+
+			//顾客类
+			//方法：点菜，吃
+			class Customer{
+        		constructor(obj) {
+
+        		}
+        		order() {
+        			log('用户点菜')
+        		}
+        		eat() {
+        			log('用户吃')
+        		}
+        	}
+
+			//菜品类
+			//属性：名字、烹饪成本、价格
+			class Food{
+        		constructor(obj) {
+        		    this.id = obj.id
+        			this.name = obj.name
+					this.cost = obj.cost
+					this.expenditure = obj.expenditure
+        		}
+            }
+			//创建一个菜单
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            var __main = function() {
+//              使用了单例模式来创建一个实例对象
+//              //1.创建一个餐厅
+//              var ifeRestaurant =  Restaurant.singleCase({
+//                  cash: 1000000,
+//                  seats: 20,
+//                  staff: []
+//              });
+//              var ifeRestaurant1 =  Restaurant.singleCase({
+//                  cash: 1,
+//                  seats: 10,
+//                  staff: []
+//              });
+                var ifeRestaurant = new Restaurant({
+                    cash: 1000000,
+                    seats: 20,
+                    staff: []
+                });
+                var ifeRestaurant1 = new Restaurant({
+                    cash: 1,
+                    seats: 10,
+                    staff: []
+                });
+                log(ifeRestaurant)
+                log(ifeRestaurant1)
+                //由于是单例，所以上面的2个是相等的
+
+ //          //创建1个服务员， 1个厨师
+                var newCook1 =  new Cook("mary", 10000);
+                var newCook =  new Cook("Tony", 10000);
+                var newWaiter = new Waiter("haha", 10000);
+                var newWaiter1 = new Waiter("ting", 100);
+                log(newCook)
+                log(newCook1)
+                //由于是单例，所以上面的2个是相等的
+                log(newWaiter)
+                log(newWaiter1)
+                //由于是单例，所以上面的2个是相等的
+            }
+            __main()
+        </script>
+    </body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>第一个：最简单的餐厅(二)</title>
+        <!--第一个：最简单的餐厅：
+                                我们上个任务已经创造了各个角色，现在，我们希望让各个角色动起来。
+
+                                我们假设只有一个厨师，一个服务员，一个座位。而且餐厅老板是个偏执狂，他喜欢简单，他需要保证餐厅永远只有一个厨师，一个服务员和一个座位。
+
+                                整个餐厅的运作流程是这样的，顾客入座，服务员招待顾客点菜，点完菜后告诉厨师，厨师做好菜后服务员上菜，顾客用餐，然后换下一个顾客
+
+                                你需要设计一个菜单，然后设计一个顾客随机点菜的方法
+        -->
+    </head>
+    <body>
+        <div class="wrapper">
+            <!--<textarea id="id-text-log" name="" rows="20" cols="40"></textarea>-->
+        </div>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script type="text/javascript" src="./data.js"></script>
+        <script type="text/javascript" src="./class_crear.js"></script>
+        <script type="text/javascript">
+           
+			//创建一个菜单
+            ///////////////////////////////////////////////
+            ///////////////////////////////////////////////
+            var __main = function() {
+//              使用了单例模式来创建一个实例对象
+//              //1.创建一个餐厅
+                var ifeRestaurant = new Restaurant({
+                    cash: 100,
+                    seats: 20,
+                    staff: []
+                });
+                log('-创建餐厅-', ifeRestaurant)
+
+ //             //创建1个服务员， 1个厨师
+                var newCook =  new Cook("mary", 10000);
+                var newWaiter = new Waiter("haha", 10000);
+                //招聘职员
+                ifeRestaurant.hire(newCook)
+                ifeRestaurant.hire(newWaiter)
+                log('-所有的职员-', ifeRestaurant.staff)
+
+//              // 创建一个顾客
+                var customer = new Customer()
+//              // 2.顾客下单
+//              数组中随机取一个值
+                var foods = getRandomArrayElements(foodList, 2)
+                customer.order(foods)
+//              // 3.服务员下单
+                newWaiter.finishJob(foods, ifeRestaurant)   
+//              // 4.厨师来做菜
+//              newCook.finishJob(ifeRestaurant, function(food) {
+////                  // 5.服务员上菜
+//                  newWaiter.finishJob(food)
+//                  //              // 6.用户吃饭
+//                  customer.eat(food)
+//                  //删除餐厅已点的菜
+//                  ifeRestaurant.foodAbout({
+//                     type: 'remove',
+//                     food: food
+//                  })
+//              })
+                var finshLast = function(food) {
+                    //                  // 5.服务员上菜
+                    newWaiter.finishJob(food)
+                    //              // 6.用户吃饭
+                    customer.eat(food)
+                    //删除餐厅已点的菜
+                    ifeRestaurant.foodAbout({
+                       type: 'remove',
+                       food: food
+                    })
+                }
+                var promiseAll = newCook.finishJob(ifeRestaurant)
+                for(var i = 0; i < promiseAll.length; i++) {
+                    var a = promiseAll[i]
+                    a.then(function(food) {
+                        finshLast(food)
+                    })
+                }
+                
+            }
+            __main()
+        </script>
+    </body>
+</html>
