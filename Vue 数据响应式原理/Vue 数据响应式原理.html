@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Vue 数据响应式原理</title>
+    </head>
+    <body>
+        <script type="text/javascript" src="../js/util.js"></script>
+        <script src="https://cdn.bootcss.com/lodash.js/4.17.12-pre/lodash.core.js"></script>
+        <script type="text/javascript">	
+			// 数据响应化
+				// 使用lodash
+				function observify(model){
+//					isObject: 检查是否value是 语言类 的Object。
+				  if(_.isObject(model)){
+				    _.each(model, function(value, key){
+				      	defineReactive(model, key, value);
+				    });
+				  }
+				}
+				
+				//定义对象的单个响应式属性
+				function defineReactive(obj, key, value){
+					log(1111111, value)
+					log(22222, _.isArray(value))
+					//判断如果是数组，修改原型上的方法
+					  if(_.isArray(value)){
+					    observifyArray(value);
+					  }else {
+					    observify(value);
+					  }
+					
+//					//判断如果值是对象的话，继续去设置
+//				  observify(value);
+				  Object.defineProperty(obj, key, {
+				    configurable: true,
+				    enumerable: true,
+				    set: function(newValue){
+				      var oldValue = value;
+				      value = newValue;
+				      //可以在修改数据时触发其他的操作
+				      console.log("newValue: ", newValue, " oldValue: ", oldValue);
+				    },
+				    get: function(){
+				      return value;
+				    }
+				  });
+				
+				}
+				//监听原生数组上的方法
+				function observifyArray(array){
+				  //需要变异的函数名列表
+				  var methods = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'];
+				  //Object.create
+				  var arrayProto = Object.create(Array.prototype);
+				  _.each(methods, function(method){
+				    arrayProto[method] = function(...args){
+				      // 劫持修改数据
+				      var ret = Array.prototype[method].apply(this, args);
+				      
+				      //可以在修改数据时触发其他的操作
+				      console.log("newValue: ", this);
+				      return ret;
+				    }
+				  });
+				  
+				  Object.setPrototypeOf(array, arrayProto);
+				}
+				
+//				//定义对象的单个响应式属性
+//				function defineReactive(obj, key, value){
+//					//判断如果是数组，修改原型上的方法
+//				  if(_.isArray(value)){
+//				    observifyArray(value, dep);
+//				  }else {
+//				    observify(value);
+//				  }
+//				  Object.defineProperty(obj, key, {
+//				  // 省略......
+//				  });
+//				}
+
+			
+            var __main = function() {
+//				var model = {
+//				  name: "MrErHu",
+//				  message: {
+//				    languange: "javascript"
+//				  },
+//				};
+//				observify(model);
+//				model.name = "mrerhu" //newValue:  mrerhu  oldValue:  MrErHu
+//				model.message.languange = "php" //newValue:  php  oldValue:  javascript
+//				model.message = { db1: "MySQL" } //newValue:  {db: "MySQL"} oldValue: {languange:"javascript"}
+
+				var model = {
+					db: [1,2, 3, 4]
+				}
+				observify(model)
+				model.db.push(8)
+//				log(1111, model)
+            }
+            __main()
+        </script>
+    </body>
+</html>

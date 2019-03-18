@@ -1,5 +1,5 @@
 //每一个时间单位是 1 秒
-var oneUnitOfTime = 100
+var oneUnitOfTime = 1000
 var id = 0
             
 var CreatCingleFun = function(fu) {
@@ -125,7 +125,7 @@ class Worker  {
 //完成一次工作：如果参数是个数组，则记录客人点菜，如果参数不是数组则是上菜行为
 class Waiter extends Worker{
     constructor(name, salary) {
-//                  构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
+//      构造函数中通过super()调用父类构造函数，如果有super方法，需要时构造函数中第一个执行的语句，this关键字在调用super之后才可用。
         super({
             name,
             salary,
