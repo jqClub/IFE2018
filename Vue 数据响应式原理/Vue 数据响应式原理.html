@@ -21,8 +21,6 @@
 				
 				//定义对象的单个响应式属性
 				function defineReactive(obj, key, value){
-					log(1111111, value)
-					log(22222, _.isArray(value))
 					//判断如果是数组，修改原型上的方法
 					  if(_.isArray(value)){
 					    observifyArray(value);
@@ -66,39 +64,13 @@
 				  
 				  Object.setPrototypeOf(array, arrayProto);
 				}
-				
-//				//定义对象的单个响应式属性
-//				function defineReactive(obj, key, value){
-//					//判断如果是数组，修改原型上的方法
-//				  if(_.isArray(value)){
-//				    observifyArray(value, dep);
-//				  }else {
-//				    observify(value);
-//				  }
-//				  Object.defineProperty(obj, key, {
-//				  // 省略......
-//				  });
-//				}
-
-			
+		
             var __main = function() {
-//				var model = {
-//				  name: "MrErHu",
-//				  message: {
-//				    languange: "javascript"
-//				  },
-//				};
-//				observify(model);
-//				model.name = "mrerhu" //newValue:  mrerhu  oldValue:  MrErHu
-//				model.message.languange = "php" //newValue:  php  oldValue:  javascript
-//				model.message = { db1: "MySQL" } //newValue:  {db: "MySQL"} oldValue: {languange:"javascript"}
-
 				var model = {
 					db: [1,2, 3, 4]
 				}
 				observify(model)
 				model.db.push(8)
-//				log(1111, model)
             }
             __main()
         </script>
